@@ -1,33 +1,51 @@
+import axios from 'axios';
 import './App.css';
 import TableView from './layouts/tableView/TableView';
 import FormNewItems from './layouts/formNewItems/FormNewItems';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 
 const App = () => {
   
-  const [items, setItems] = useState([
-    {id:1, fullName:"ФИО 1", telephone:"Телефон 10", notes:"Заметки"},
-    {id:2, fullName:"ФИО 2", telephone:"Телефон 10", notes:"Заметки"},
-    {id:3, fullName:"ФИО 3", telephone:"Телефон 10", notes:"Заметки"},
-    {id:4, fullName:"ФИО 4", telephone:"Телефон 10", notes:"Заметки"},
-    {id:5, fullName:"ФИО 5", telephone:"Телефон 10", notes:"Заметки"},
-  ]); 
+  const [items, setItems] = useState([]);
+  
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/contacts')
+    .then(res => {
+      const data = [];
+      res.data._embedded.contacts.forEach(item => {
+        data.push(
+          {
+            id: item.id,
+            fullName: item.fullName,
+            telephone: item.telephone,
+            notes: item.notes
+          }
+        )
+      })
+      setItems(data);
+    })
+  }, []); 
 
   const appendContact = (fullName, telephone, notes) => {
-    const length = items.length;
-    let currentId = 0;
-
-    if(length === 0){
-      currentId = 1;
-    } else {
-      currentId = items[length - 1].id + 1;
-    }
     
-    const temp = {id: currentId, fullName: fullName, telephone: telephone, notes: notes}
-    setItems([...items, temp]);
+    const temp = {
+      //id: currentId,
+      fullName: fullName,
+      telephone: telephone,
+      notes: notes}
+    
+    const url = 'http://localhost:8080/api/contacts';
+    axios.post(url, temp)
+      .then(e => {
+        temp.id = e.data.id
+        setItems([...items, temp]);
+      });
+
   }
 
   const removeContact = (id) => {
+    const url = `http://localhost:8080/api/contacts/${id}`;
+    axios.delete(url);
     setItems(items.filter(item => item.id != id));
   }
 

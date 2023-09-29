@@ -13,8 +13,13 @@ const TableView = (props) => {
               </tr>
             </thead>
             <tbody>
-              {props.data.map(item => (
-                  <TableRowItem key = {item.id} removeContact = {props.removeContact} contact = {item}/>
+              {props.data.map((item, index) => (
+                  <TableRowItem
+                    key = {item.id}
+                    removeContact = {props.removeContact}
+                    contact = {item}
+                    index = {index + 1}
+                    />
                 ))}
             </tbody>
         </table>
